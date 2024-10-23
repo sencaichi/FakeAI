@@ -9,23 +9,21 @@ import UIKit
 import CoreML
 import Vision
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ViewController: UIViewController {
+    var firstRun = true
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var resultLabel: UILabel!
-    
-    // let config = MLModelConfiguration()
-    let imagePicker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        imagePicker.delegate = self
+        photoPicker.delegate = self
     }
     
     
     @IBAction func selectImage(_ sender: UIButton) {
-        imagePicker.sourceType = .photoLibrary
-        present(imagePicker, animated: true, completion: nil)
+        present(photoPicker, animated: true)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -43,4 +41,34 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     }
     
+}
+
+extension ViewController {
+    func updateImage(_ image: UIImage) {
+        DispatchQueue.main.async {
+            self.imageView.image = image
+        }
+    }
+    
+    func updateResult(_ message: String) {
+        DispatchQueue.main.async {
+            self.resultLabel.text = message
+        }
+        
+        if firstRun {
+            DispatchQueue.main.async {
+                self.firstRun = false
+                self.resultLabel.superview?.isHidden = false
+            }
+        }
+    }
+    
+    func userSelectedPhoto(_ photo: UIImage) {
+        updateImage(photo)
+        updateResult("Making predictions for the photo...")
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.classifyImage(photo)
+        }
+    }
 }
