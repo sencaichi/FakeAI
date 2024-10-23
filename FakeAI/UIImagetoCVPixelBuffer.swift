@@ -1,4 +1,4 @@
-//
+/*
 //  UIImagetoCVPixelBuffer.swift
 //  FakeAI
 //
@@ -38,3 +38,4 @@ extension UIImage {
         return buffer
     }
 }
+*/

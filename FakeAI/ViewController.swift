@@ -37,14 +37,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     
     func classifyImage(_ image: UIImage) {
-        guard let model = try? AI_or_Human(configuration: .init()) else {
-            fatalError("Failed to load model")
+        // create a Vision instance using the image classifier's model instance
+        guard let model = try? VNCoreMLModel(for: AI_or_Human(configuration: MLModelConfiguration()).model) else {
+            fatalError("Failed to load model.")
         }
-        
-        guard let pixelBuffer = image.toCVPixelBuffer() else {
-            return
-        }
-        
+                
         if let prediction = try? model.prediction(image: pixelBuffer) {
             resultLabel.text = "This image is \(prediction.target)"
         }
