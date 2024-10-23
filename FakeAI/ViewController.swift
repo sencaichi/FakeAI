@@ -41,10 +41,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         guard let model = try? VNCoreMLModel(for: AI_or_Human(configuration: MLModelConfiguration()).model) else {
             fatalError("Failed to load model.")
         }
-                
-        if let prediction = try? model.prediction(image: pixelBuffer) {
-            resultLabel.text = "This image is \(prediction.target)"
-        }
     }
     
 }

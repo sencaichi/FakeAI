@@ -26,4 +26,7 @@ class ImagePredictor {
         
         return imageClassifierVisionModel
     }
+    
+    // a common image classifier instance that all Image Predictor instances use to generate predictions
+    private static let imageClassifier = createImageClassifier()
 }
