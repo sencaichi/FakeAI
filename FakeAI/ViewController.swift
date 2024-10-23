@@ -17,6 +17,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var resultLabel: UILabel!
     
+    let predictionsToShow = 2
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -78,7 +80,7 @@ extension ViewController {
         let formattedPredictions = formatPredictions(predictions)
 
         let predictionString = formattedPredictions.joined(separator: "\n")
-        updatePredictionLabel(predictionString)
+        updateResult(predictionString)
     }
     
     private func formatPredictions(_ predictions: [ImagePredictor.Prediction]) -> [String] {
@@ -91,7 +93,7 @@ extension ViewController {
                 name = String(name.prefix(upTo: firstComma))
             }
 
-            return "\(name) - \(prediction.confidencePercentage)%"
+            return "\(name) - \(prediction.targetProbability)%"
         }
 
         return topPredictions
