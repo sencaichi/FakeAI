@@ -22,6 +22,20 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imagePicker.delegate = self
     }
     
+    
+    @IBAction func selectImage(_ sender: UIButton) {
+        imagePicker.sourceType = .photoLibrary
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let pickedImage = info[.originalImage] as? UIImage {
+                imageView.image = pickedImage
+                classifyImage(pickedImage)
+            }
+            dismiss(animated: true, completion: nil)
+        }
+    
     func classifyImage(_ image: UIImage) {
         guard let model = try? AI_or_Human(configuration: .init()) else {
             fatalError("Failed to load model")
@@ -32,7 +46,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
         
         if let prediction = try? model.prediction(image: pixelBuffer) {
-            resultLabel.text = "This image is \(prediction.classLabel)"
+            resultLabel.text = "This image is \(prediction.target)"
         }
     }
     
