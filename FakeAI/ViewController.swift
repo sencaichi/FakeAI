@@ -10,8 +10,10 @@ import CoreML
 import Vision
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var resultLabel: UILabel!
     
-    let config = MLModelConfiguration()
+    // let config = MLModelConfiguration()
     let imagePicker = UIImagePickerController()
     
     override func viewDidLoad() {
