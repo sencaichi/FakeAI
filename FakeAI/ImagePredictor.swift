@@ -27,6 +27,11 @@ class ImagePredictor {
         return imageClassifierVisionModel
     }
     
+    struct Prediction {
+        let target: String
+        let targetProbability: Double
+    }
+    
     // a common image classifier instance that all Image Predictor instances use to generate predictions
     private static let imageClassifier = createImageClassifier()
 }

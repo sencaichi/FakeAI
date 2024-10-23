@@ -12,6 +12,8 @@ import Vision
 class ViewController: UIViewController {
     var firstRun = true
     
+    let imagePredictor = ImagePredictor()
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var resultLabel: UILabel!
     
@@ -25,22 +27,6 @@ class ViewController: UIViewController {
     @IBAction func selectImage(_ sender: UIButton) {
         present(photoPicker, animated: true)
     }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let pickedImage = info[.originalImage] as? UIImage {
-                imageView.image = pickedImage
-                classifyImage(pickedImage)
-            }
-            dismiss(animated: true, completion: nil)
-        }
-    
-    func classifyImage(_ image: UIImage) {
-        // create a Vision instance using the image classifier's model instance
-        guard let model = try? VNCoreMLModel(for: AI_or_Human(configuration: MLModelConfiguration()).model) else {
-            fatalError("Failed to load model.")
-        }
-    }
-    
 }
 
 extension ViewController {
@@ -70,5 +56,44 @@ extension ViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             self.classifyImage(photo)
         }
+    }
+}
+
+extension ViewController {
+    func classifyImage(_ image: UIImage) {
+        // create a Vision instance using the image classifier's model instance
+        do {
+            try self.imagePredictor.makePredictions(for: image, completionHandler: imagePredictionHandler)
+        } catch {
+            print("Vision was unable to make a prediction...")
+        }
+    }
+    
+    private func imagePredictionHandler(_ predictions: [ImagePredictor.Prediction]?) {
+        guard let predictions = predictions else {
+            updateResult("No predictions. (Check console log.)")
+            return
+        }
+
+        let formattedPredictions = formatPredictions(predictions)
+
+        let predictionString = formattedPredictions.joined(separator: "\n")
+        updatePredictionLabel(predictionString)
+    }
+    
+    private func formatPredictions(_ predictions: [ImagePredictor.Prediction]) -> [String] {
+        // Vision sorts the classifications in descending confidence order.
+        let topPredictions: [String] = predictions.prefix(predictionsToShow).map { prediction in
+            var name = prediction.target
+
+            // For classifications with more than one name, keep the one before the first comma.
+            if let firstComma = name.firstIndex(of: ",") {
+                name = String(name.prefix(upTo: firstComma))
+            }
+
+            return "\(name) - \(prediction.confidencePercentage)%"
+        }
+
+        return topPredictions
     }
 }
